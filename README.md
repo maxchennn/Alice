@@ -12,8 +12,3 @@
 * Matugen Soul: Light and shadow color palettes.
 * High-End Pixels: Optimized for sharp displays.
 
----
-
-* Enter Wonderland
-```bash
-$ git clone [https://github.com/zzzyyyuuuuu/Alice.git](https://github.com/zzzyyyuuuuu/Alice.git)
