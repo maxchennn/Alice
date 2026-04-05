@@ -3,54 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 Alice Era | Gallery</title>
+    <title>Alice Era</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Syne:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --main-color: #ffb7c5; --bg-color: #0d0d0d; }
-        body { background: var(--bg-color); color: white; font-family: 'Inter', sans-serif; margin: 0; }
-        .header { padding: 60px 20px; text-align: center; background: radial-gradient(circle at center, #ffb7c510 0%, transparent 80%); }
-        h1 { font-size: 3.5rem; text-shadow: 0 0 25px var(--main-color); margin: 0; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px; max-width: 1300px; margin: 0 auto; }
-        .card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 183, 197, 0.1); border-radius: 18px; overflow: hidden; transition: 0.4s; backdrop-filter: blur(10px); }
-        .card:hover { transform: translateY(-10px); border-color: var(--main-color); box-shadow: 0 15px 35px rgba(255, 183, 197, 0.15); }
-        .img-container { width: 100%; height: 220px; background: #1a1a1a; overflow: hidden; }
-        img { width: 100%; height: 100%; object-fit: cover; }
-        .card-info { padding: 15px; text-align: center; }
-        .download-btn { background: var(--main-color); color: #121212; text-decoration: none; padding: 10px 25px; border-radius: 25px; font-weight: 900; display: inline-block; text-transform: uppercase; font-size: 0.8rem; }
-        .download-btn:hover { opacity: 0.85; transform: scale(1.05); transition: 0.2s; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #080808;
+            --fg: #efefef;
+            --dim: #1e1e1e;
+            --muted: #555;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Syne', sans-serif;
+            font-weight: 300;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom cursor */
+        .cursor {
+            position: fixed;
+            width: 8px; height: 8px;
+            background: var(--fg);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-ring {
+            position: fixed;
+            width: 32px; height: 32px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* Header */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 0 6vw 8vh;
+            position: relative;
+            border-bottom: 1px solid var(--dim);
+            overflow: hidden;
+        }
+
+        .header-line {
+            width: 1px;
+            height: 0;
+            background: var(--dim);
+            position: absolute;
+            top: 0; left: 6vw;
+            animation: lineGrow 1.4s cubic-bezier(0.77,0,0.175,1) 0.1s forwards;
+        }
+
+        @keyframes lineGrow {
+            to { height: 100%; }
+        }
+
+        .header-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeUp 0.9s ease 0.5s forwards;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-size: clamp(5rem, 14vw, 13rem);
+            line-height: 0.88;
+            letter-spacing: -0.04em;
+            opacity: 0;
+            animation: fadeUp 1.1s cubic-bezier(0.25,0.46,0.45,0.94) 0.3s forwards;
+        }
+
+        h1 em {
+            font-style: italic;
+            color: var(--muted);
+            display: block;
+        }
+
+        .header-footer {
+            margin-top: 3.5rem;
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            opacity: 0;
+            animation: fadeUp 0.9s ease 0.7s forwards;
+        }
+
+        .header-footer span {
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .header-footer .line {
+            flex: 1;
+            height: 1px;
+            background: var(--dim);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Gallery */
+        .gallery-section {
+            padding: 6vw;
+        }
+
+        .section-label {
+            font-size: 0.6rem;
+            letter-spacing: 0.35em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 3.5rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .section-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--dim);
+        }
+
+        /* Masonry */
+        .gallery {
+            columns: 3;
+            column-gap: 12px;
+        }
+
+        @media (max-width: 900px)  { .gallery { columns: 2; } }
+        @media (max-width: 560px)  { .gallery { columns: 1; } }
+
+        .card {
+            break-inside: avoid;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            background: var(--dim);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card img {
+            width: 100%;
+            display: block;
+            filter: brightness(0.9) saturate(0.9);
+            transition: transform 0.9s cubic-bezier(0.25,0.46,0.45,0.94),
+                        filter 0.6s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.07);
+            filter: brightness(1.05) saturate(1.1);
+        }
+
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 16px 18px;
+        }
+
+        .card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .card-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: rgba(240,240,240,0.95);
+            color: #080808;
+            text-decoration: none;
+            font-family: 'Syne', sans-serif;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            transform: translateY(8px);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94),
+                        opacity 0.35s ease,
+                        background 0.2s;
+        }
+
+        .card:hover .download-btn {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .download-btn:hover {
+            background: rgba(255,255,255,1);
+        }
+
+        /* Footer */
+        footer {
+            padding: 4vh 6vw;
+            border-top: 1px solid var(--dim);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        footer span {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .back-top {
+            background: none;
+            border: 1px solid var(--dim);
+            color: var(--muted);
+            font-family: 'Syne', sans-serif;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 10px 22px;
+            cursor: none;
+            transition: border-color 0.25s, color 0.25s;
+        }
+
+        .back-top:hover {
+            border-color: var(--fg);
+            color: var(--fg);
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>🌸 Alice Era 🌸</h1>
-        <p style="opacity: 0.6;">Wallpapers for vroomies &lt;3</p>
-    </div>
-    <div id="gallery" class="gallery"></div>
-    <script>
-        const gallery = document.getElementById('gallery');
-        const images = [
-            "1.jpg","2.jpg","3.png","4.png","5.jpg","6.jpg","7.jpg","8.png","9.png","10.png",
-            "11.png","12.png","13.png","14.jpg","15.jpg","16.png","17.png","18.png","19.png","20.png",
-            "21.png","22.png","23.png","24.png","25.png","26.png","27.png","28.jpg","29.png","30.png",
-            "31.png","32.png","33.png","34.png","35.png","36.png","37.png","38.png","39.png","40.jpg",
-            "41.jpg","42.jpg","43.png","44.png","45.jpg","46.png","47.jpg","48.png","49.png","50.png",
-            "51.png","52.png","53.png","54.png","55.jpg","56.png","57.png","58.png","59.png","60.png",
-            "61.png","62.png","63.png","64.png","65.png","66.png","67.png","68.png","69.jpg","70.jpg",
-            "71.jpg","72.jpg","73.png","74.png","75.png","76.png"
-        ];
 
-        images.forEach(filename => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="img-container">
-                    <img src="${filename}" alt="${filename}">
-                </div>
-                <div class="card-info">
-                    <a href="${filename}" download class="download-btn">DOWNLOAD</a>
-                </div>
-            `;
-            gallery.appendChild(card);
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<header>
+    <div class="header-line"></div>
+    <p class="header-label">Wallpaper Collection</p>
+    <h1>Alice<em>Era</em></h1>
+    <div class="header-footer">
+        <span>Wallpapers for vroomies &lt;3</span>
+        <div class="line"></div>
+        <span id="wall-count"></span>
+    </div>
+</header>
+
+<div class="gallery-section">
+    <div class="section-label">All Walls</div>
+    <div id="gallery" class="gallery"></div>
+</div>
+
+<footer>
+    <span>Alice Era</span>
+    <button class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to top</button>
+</footer>
+
+<script>
+    // Cursor
+    const cur = document.getElementById('cursor');
+    const ring = document.getElementById('ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cur.style.left = mx + 'px';
+        cur.style.top = my + 'px';
+    });
+
+    (function animateRing() {
+        rx += (mx - rx) * 0.1;
+        ry += (my - ry) * 0.1;
+        ring.style.left = rx + 'px';
+        ring.style.top = ry + 'px';
+        requestAnimationFrame(animateRing);
+    })();
+
+    // Gallery
+    const gallery = document.getElementById('gallery');
+    const images = [
+        "1.jpg","2.jpg","3.png","4.png","5.jpg","6.jpg","7.jpg","8.png","9.png","10.png",
+        "11.png","12.png","13.png","14.jpg","15.jpg","16.png","17.png","18.png","19.png","20.png",
+        "21.png","22.png","23.png","24.png","25.png","26.png","27.png","28.jpg","29.png","30.png",
+        "31.png","32.png","33.png","34.png","35.png","36.png","37.png","38.png","39.png","40.jpg",
+        "41.jpg","42.jpg","43.png","44.png","45.jpg","46.png","47.jpg","48.png","49.png","50.png",
+        "51.png","52.png","53.png","54.png","55.jpg","56.png","57.png","58.png","59.png","60.png",
+        "61.png","62.png","63.png","64.png","65.png","66.png","67.png","68.png","69.jpg","70.jpg",
+        "71.jpg","72.jpg","73.png","74.png","75.png","76.png"
+    ];
+
+    document.getElementById('wall-count').textContent = images.length + ' walls';
+
+    images.forEach((file, i) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <img src="${file}" alt="Wall ${i+1}" loading="lazy" onerror="this.closest('.card').style.display='none'">
+            <div class="card-overlay">
+                <span class="card-num">${String(i+1).padStart(2,'0')}</span>
+                <a href="${file}" download class="download-btn">↓ Save</a>
+            </div>
+        `;
+        gallery.appendChild(card);
+    });
+
+    // Scroll reveal with stagger
+    const obs = new IntersectionObserver(entries => {
+        entries.forEach((e, i) => {
+            if (e.isIntersecting) {
+                setTimeout(() => e.target.classList.add('visible'), i * 50);
+                obs.unobserve(e.target);
+            }
         });
-    </script>
+    }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.card').forEach(c => obs.observe(c));
+</script>
 </body>
 </html>
