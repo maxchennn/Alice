@@ -3,122 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 Alice Era | Wallpaper Gallery</title>
+    <title>🌸 Alice Era | Gallery</title>
     <style>
-        :root { 
-            --main-color: #ffb7c5; 
-            --bg-color: #0f0f0f; 
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --border-color: rgba(255, 183, 197, 0.15);
-        }
-        body { 
-            background: var(--bg-color); 
-            color: white; 
-            font-family: 'Inter', sans-serif; 
-            margin: 0;
-            overflow-x: hidden;
-        }
-        .header { 
-            padding: 80px 20px; 
-            text-align: center; 
-            background: radial-gradient(circle at center, #ffb7c515 0%, transparent 70%); 
-        }
-        h1 { 
-            font-size: 3.5rem; 
-            margin: 0;
-            text-shadow: 0 0 30px var(--main-color); 
-            letter-spacing: -2px;
-        }
-        .gallery { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-            gap: 30px; 
-            padding: 40px; 
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .card { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-color);
-            border-radius: 20px; 
-            overflow: hidden; 
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(12px);
-            opacity: 0; /* Başlangıçta gizle */
-            transform: translateY(20px);
-            animation: fadeIn 0.8s forwards; /* Animasyon ekle */
-        }
-        .card:hover { 
-            transform: translateY(-15px) scale(1.02); 
-            border-color: var(--main-color);
-            box-shadow: 0 20px 40px rgba(255, 183, 197, 0.2); 
-        }
-        img { 
-            width: 100%; 
-            height: 220px; 
-            object-fit: cover; 
-            border-bottom: 1px solid rgba(255, 183, 197, 0.1);
-        }
-        .card-info { padding: 20px; text-align: center; }
-        .download-btn { 
-            background: var(--main-color); 
-            color: #000;
-            text-decoration: none;
-            border: none; 
-            padding: 10px 25px; 
-            border-radius: 30px; 
-            cursor: pointer; 
-            font-weight: 800;
-            display: inline-block;
-            transition: 0.3s;
-        }
-        .download-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px var(--main-color);
-        }
-
-        /* FadeIn Animasyonu */
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Animasyon gecikmesi için */
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
+        :root { --main-color: #ffb7c5; --bg-color: #0d0d0d; }
+        body { background: var(--bg-color); color: white; font-family: 'Inter', sans-serif; margin: 0; }
+        .header { padding: 60px 20px; text-align: center; background: radial-gradient(circle at center, #ffb7c510 0%, transparent 80%); }
+        h1 { font-size: 3.5rem; text-shadow: 0 0 25px var(--main-color); margin: 0; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 20px; max-width: 1300px; margin: 0 auto; }
+        .card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 183, 197, 0.1); border-radius: 18px; overflow: hidden; transition: 0.4s; backdrop-filter: blur(10px); }
+        .card:hover { transform: translateY(-10px); border-color: var(--main-color); box-shadow: 0 15px 35px rgba(255, 183, 197, 0.15); }
+        .img-container { width: 100%; height: 220px; background: #1a1a1a; overflow: hidden; }
+        img { width: 100%; height: 100%; object-fit: cover; }
+        .card-info { padding: 15px; text-align: center; }
+        .download-btn { background: var(--main-color); color: #121212; text-decoration: none; padding: 10px 25px; border-radius: 25px; font-weight: 900; display: inline-block; text-transform: uppercase; font-size: 0.8rem; }
     </style>
 </head>
 <body>
+
     <div class="header">
         <h1>🌸 Alice Era 🌸</h1>
-        <p style="opacity: 0.7;">Wallpapers for vroomies <3</p>
+        <p style="opacity: 0.6;">Wallpapers for vroomies <3</p>
     </div>
 
-    <div class="gallery">
-        <div class="card">
-            <img src="1.png" alt="Wallpaper 1">
-            <div class="card-info">
-                <a href="1.png" download class="download-btn">DOWNLOAD</a>
-            </div>
-        </div>
+    <div id="gallery" class="gallery"></div>
 
-        <div class="card">
-            <img src="2.jpg" alt="Wallpaper 2">
-            <div class="card-info">
-                <a href="2.jpg" download class="download-btn">DOWNLOAD</a>
-            </div>
-        </div>
+    <script>
+        const gallery = document.getElementById('gallery');
+        const totalImages = 50; // Burayı toplam resim sayına göre güncelle
 
-        <div class="card">
-            <img src="3.png" alt="Wallpaper 3">
-            <div class="card-info">
-                <a href="3.png" download class="download-btn">DOWNLOAD</a>
-            </div>
-        </div>
-
-        </div>
+        for (let i = 1; i <= totalImages; i++) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="img-container">
+                    <img src="${i}.png" alt="Wallpaper ${i}" onerror="this.onerror=null;this.src='${i}.jpg';">
+                </div>
+                <div class="card-info">
+                    <a href="${i}.png" download class="download-btn" onclick="this.href=this.parentElement.parentElement.querySelector('img').src">DOWNLOAD</a>
+                </div>
+            `;
+            gallery.appendChild(card);
+        }
+    </script>
 </body>
 </html>
