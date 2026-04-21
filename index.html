@@ -3,801 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice Era // Archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Syne:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Alice // Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500&family=Fraunces:ital,wght@1,300&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --bg: #080808;
-            --fg: #efefef;
-            --dim: #1e1e1e;
-            --muted: #555;
-        }
+        :root { --bg: #050505; --fg: #e0dcd3; --dim: #121212; --muted: #444; }
 
         body {
-            background: var(--bg);
-            color: var(--fg);
-            font-family: 'Syne', sans-serif;
-            font-weight: 300;
-            overflow-x: hidden;
-            cursor: none;
+            background: var(--bg); color: var(--fg);
+            font-family: 'Space Grotesk', sans-serif; font-weight: 300;
+            overflow-x: hidden; cursor: none;
         }
 
-        .cursor { position: fixed; width: 8px; height: 8px; background: var(--fg); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
-        .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; }
+        /* Custom Cursor */
+        .cursor { position: fixed; width: 6px; height: 6px; background: var(--fg); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
+        .cursor-ring { position: fixed; width: 26px; height: 26px; border: 1px solid rgba(224,220,211,0.15); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; }
 
         header {
-            height: 60vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 6vw;
-            border-bottom: 1px solid var(--dim);
+            height: 70vh; display: flex; flex-direction: column; justify-content: center;
+            padding: 0 8vw; position: relative; border-bottom: 1px solid var(--dim);
         }
 
-        .header-label {
-            font-size: 0.65rem;
-            letter-spacing: 0.35em;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-        }
+        h1 { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; font-size: clamp(4rem, 12vw, 10rem); line-height: 0.9; letter-spacing: -0.03em; }
+        .header-meta { margin-top: 2rem; font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted); }
 
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 400;
-            font-size: clamp(4rem, 12vw, 10rem);
-            line-height: 0.88;
-            letter-spacing: -0.04em;
-        }
-
-        h1 em { font-style: italic; color: var(--muted); display: block; }
-
-        .category-section {
-            padding: 6vh 0;
-            border-bottom: 1px solid #111;
-        }
-
-        .section-label {
-            font-size: 0.7rem;
-            letter-spacing: 0.4em;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin-bottom: 2rem;
-            padding-left: 6vw;
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--dim); }
-
-        .carousel-container {
-            display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0 6vw 20px;
-            gap: 20px;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-        }
-
-        .carousel-container::-webkit-scrollbar { display: none; }
+        .gallery-section { padding: 8vw; }
+        .gallery { columns: 3; column-gap: 20px; }
+        @media (max-width: 1100px) { .gallery { columns: 2; } }
+        @media (max-width: 700px) { .gallery { columns: 1; } }
 
         .card {
-            flex: 0 0 450px;
-            scroll-snap-align: start;
-            position: relative;
-            overflow: hidden;
-            background: var(--dim);
-            aspect-ratio: 16/10;
+            break-inside: avoid; margin-bottom: 20px; position: relative;
+            background: var(--dim); overflow: hidden; opacity: 0; transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
         }
-
-        @media (max-width: 768px) { .card { flex: 0 0 300px; } }
-
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: brightness(0.8) grayscale(100%);
-            transition: transform 0.9s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.6s ease;
-        }
-
-        .card:hover img {
-            transform: scale(1.05);
-            filter: brightness(1) grayscale(0%);
-        }
-
-        .card-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            display: flex;
-            align-items: flex-end;
-            padding: 20px;
-        }
-
+        .card.visible { opacity: 1; transform: translateY(0); }
+        .card img { width: 100%; display: block; filter: grayscale(100%); transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1), filter 0.8s ease; }
+        .card:hover img { transform: scale(1.08); filter: grayscale(0%); }
+        .card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: flex-end; padding: 20px; }
         .card:hover .card-overlay { opacity: 1; }
-        .card-info { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--fg); text-transform: uppercase; }
-
-        footer {
-            padding: 8vh 6vw;
-            text-align: center;
-            font-size: 0.6rem;
-            letter-spacing: 0.3em;
-            color: var(--muted);
-            text-transform: uppercase;
-        }
+        .card-num { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--fg); text-transform: uppercase; }
     </style>
 </head>
 <body>
-
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="ring"></div>
-
-<header>
-    <p class="header-label">Digital Archive</p>
-    <h1>Alice<em>Era</em></h1>
-</header>
-
-<main>
-    <section class='category-section'>
-        <div class='section-label'>Anime</div>
-        <div class='carousel-container'>
-            <div class='card'>
-                <a href='Anime/01.jpg' target='_blank'>
-                    <img src='Anime/01.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>01.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/02.jpg' target='_blank'>
-                    <img src='Anime/02.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>02.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/03.png' target='_blank'>
-                    <img src='Anime/03.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>03.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/04.jpg' target='_blank'>
-                    <img src='Anime/04.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>04.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/05.jpg' target='_blank'>
-                    <img src='Anime/05.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>05.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/06.jpg' target='_blank'>
-                    <img src='Anime/06.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>06.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/07.png' target='_blank'>
-                    <img src='Anime/07.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>07.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/08.png' target='_blank'>
-                    <img src='Anime/08.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>08.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/09.png' target='_blank'>
-                    <img src='Anime/09.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>09.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/10.jpg' target='_blank'>
-                    <img src='Anime/10.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>10.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/11.jpg' target='_blank'>
-                    <img src='Anime/11.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>11.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/12.png' target='_blank'>
-                    <img src='Anime/12.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>12.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/13.png' target='_blank'>
-                    <img src='Anime/13.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>13.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/14.png' target='_blank'>
-                    <img src='Anime/14.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>14.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/15.png' target='_blank'>
-                    <img src='Anime/15.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>15.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/16.png' target='_blank'>
-                    <img src='Anime/16.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>16.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/17.jpg' target='_blank'>
-                    <img src='Anime/17.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>17.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/18.png' target='_blank'>
-                    <img src='Anime/18.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>18.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/19.png' target='_blank'>
-                    <img src='Anime/19.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>19.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/20.png' target='_blank'>
-                    <img src='Anime/20.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>20.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/21.png' target='_blank'>
-                    <img src='Anime/21.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>21.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/22.jpg' target='_blank'>
-                    <img src='Anime/22.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>22.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/23.jpg' target='_blank'>
-                    <img src='Anime/23.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>23.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/24.jpg' target='_blank'>
-                    <img src='Anime/24.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>24.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/25.png' target='_blank'>
-                    <img src='Anime/25.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>25.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/26.png' target='_blank'>
-                    <img src='Anime/26.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>26.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/27.png' target='_blank'>
-                    <img src='Anime/27.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>27.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/28.png' target='_blank'>
-                    <img src='Anime/28.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>28.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/29.png' target='_blank'>
-                    <img src='Anime/29.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>29.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/30.jpg' target='_blank'>
-                    <img src='Anime/30.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>30.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/31.jpg' target='_blank'>
-                    <img src='Anime/31.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>31.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/32.jpg' target='_blank'>
-                    <img src='Anime/32.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>32.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/33.jpg' target='_blank'>
-                    <img src='Anime/33.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>33.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/34.jpg' target='_blank'>
-                    <img src='Anime/34.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>34.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/35.jpeg' target='_blank'>
-                    <img src='Anime/35.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>35.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/36.jpeg' target='_blank'>
-                    <img src='Anime/36.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>36.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/37.jpeg' target='_blank'>
-                    <img src='Anime/37.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>37.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/38.jpg' target='_blank'>
-                    <img src='Anime/38.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>38.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/39.jpeg' target='_blank'>
-                    <img src='Anime/39.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>39.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/40.jpeg' target='_blank'>
-                    <img src='Anime/40.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>40.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/41.jpeg' target='_blank'>
-                    <img src='Anime/41.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>41.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/42.jpeg' target='_blank'>
-                    <img src='Anime/42.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>42.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/43.jpg' target='_blank'>
-                    <img src='Anime/43.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>43.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/44.jpg' target='_blank'>
-                    <img src='Anime/44.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>44.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/45.jpg' target='_blank'>
-                    <img src='Anime/45.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>45.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/46.png' target='_blank'>
-                    <img src='Anime/46.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>46.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/47.png' target='_blank'>
-                    <img src='Anime/47.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>47.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/48.png' target='_blank'>
-                    <img src='Anime/48.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>48.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/49.png' target='_blank'>
-                    <img src='Anime/49.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>49.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/50.jpg' target='_blank'>
-                    <img src='Anime/50.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>50.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/51.jpg' target='_blank'>
-                    <img src='Anime/51.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>51.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/52.jpg' target='_blank'>
-                    <img src='Anime/52.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>52.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/53.png' target='_blank'>
-                    <img src='Anime/53.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>53.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/54.jpg' target='_blank'>
-                    <img src='Anime/54.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>54.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/55.jpg' target='_blank'>
-                    <img src='Anime/55.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>55.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/56.jpg' target='_blank'>
-                    <img src='Anime/56.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>56.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/57.jpg' target='_blank'>
-                    <img src='Anime/57.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>57.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/58.jpg' target='_blank'>
-                    <img src='Anime/58.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>58.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/59.png' target='_blank'>
-                    <img src='Anime/59.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>59.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/60.jpg' target='_blank'>
-                    <img src='Anime/60.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>60.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/61.png' target='_blank'>
-                    <img src='Anime/61.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>61.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/62.png' target='_blank'>
-                    <img src='Anime/62.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>62.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/63.png' target='_blank'>
-                    <img src='Anime/63.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>63.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/64.png' target='_blank'>
-                    <img src='Anime/64.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>64.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/65.png' target='_blank'>
-                    <img src='Anime/65.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>65.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Anime/66.png' target='_blank'>
-                    <img src='Anime/66.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>66.png</span></div>
-                </a>
-            </div>
-        </div>
-    </section>
-    <section class='category-section'>
-        <div class='section-label'>Atmospheric</div>
-        <div class='carousel-container'>
-            <div class='card'>
-                <a href='Atmospheric/01.jpg' target='_blank'>
-                    <img src='Atmospheric/01.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>01.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/02.png' target='_blank'>
-                    <img src='Atmospheric/02.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>02.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/03.png' target='_blank'>
-                    <img src='Atmospheric/03.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>03.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/04.jpg' target='_blank'>
-                    <img src='Atmospheric/04.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>04.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/05.png' target='_blank'>
-                    <img src='Atmospheric/05.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>05.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/06.png' target='_blank'>
-                    <img src='Atmospheric/06.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>06.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/07.jpg' target='_blank'>
-                    <img src='Atmospheric/07.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>07.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/08.png' target='_blank'>
-                    <img src='Atmospheric/08.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>08.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/09.png' target='_blank'>
-                    <img src='Atmospheric/09.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>09.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/10.jpg' target='_blank'>
-                    <img src='Atmospheric/10.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>10.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/11.jpg' target='_blank'>
-                    <img src='Atmospheric/11.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>11.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/12.png' target='_blank'>
-                    <img src='Atmospheric/12.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>12.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/13.png' target='_blank'>
-                    <img src='Atmospheric/13.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>13.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/14.jpeg' target='_blank'>
-                    <img src='Atmospheric/14.jpeg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>14.jpeg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/15.jpg' target='_blank'>
-                    <img src='Atmospheric/15.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>15.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/16.png' target='_blank'>
-                    <img src='Atmospheric/16.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>16.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/17.png' target='_blank'>
-                    <img src='Atmospheric/17.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>17.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/18.jpg' target='_blank'>
-                    <img src='Atmospheric/18.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>18.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/19.jpg' target='_blank'>
-                    <img src='Atmospheric/19.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>19.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/20.jpg' target='_blank'>
-                    <img src='Atmospheric/20.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>20.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/21.png' target='_blank'>
-                    <img src='Atmospheric/21.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>21.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/22.jpg' target='_blank'>
-                    <img src='Atmospheric/22.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>22.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/23.png' target='_blank'>
-                    <img src='Atmospheric/23.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>23.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/24.png' target='_blank'>
-                    <img src='Atmospheric/24.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>24.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/25.jpg' target='_blank'>
-                    <img src='Atmospheric/25.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>25.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/26.png' target='_blank'>
-                    <img src='Atmospheric/26.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>26.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/27.png' target='_blank'>
-                    <img src='Atmospheric/27.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>27.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/28.jpg' target='_blank'>
-                    <img src='Atmospheric/28.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>28.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Atmospheric/29.png' target='_blank'>
-                    <img src='Atmospheric/29.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>29.png</span></div>
-                </a>
-            </div>
-        </div>
-    </section>
-    <section class='category-section'>
-        <div class='section-label'>Gothicism</div>
-        <div class='carousel-container'>
-            <div class='card'>
-                <a href='Gothicism/106.jpg' target='_blank'>
-                    <img src='Gothicism/106.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>106.jpg</span></div>
-                </a>
-            </div>
-        </div>
-    </section>
-    <section class='category-section'>
-        <div class='section-label'>Retro</div>
-        <div class='carousel-container'>
-            <div class='card'>
-                <a href='Retro/01.png' target='_blank'>
-                    <img src='Retro/01.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>01.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Retro/02.png' target='_blank'>
-                    <img src='Retro/02.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>02.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Retro/03.png' target='_blank'>
-                    <img src='Retro/03.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>03.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Retro/04.jpg' target='_blank'>
-                    <img src='Retro/04.jpg' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>04.jpg</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Retro/05.png' target='_blank'>
-                    <img src='Retro/05.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>05.png</span></div>
-                </a>
-            </div>
-            <div class='card'>
-                <a href='Retro/87.png' target='_blank'>
-                    <img src='Retro/87.png' loading='lazy'>
-                    <div class='card-overlay'><span class='card-info'>87.png</span></div>
-                </a>
-            </div>
-        </div>
-    </section>
-</main>
-
-<footer>
-    Alice Era // 2026 Archive
-</footer>
-
-<script>
-    const cur = document.getElementById('cursor');
-    const ring = document.getElementById('ring');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-
-    document.addEventListener('mousemove', e => {
-        mx = e.clientX; my = e.clientY;
-        cur.style.left = mx + 'px'; cur.style.top = my + 'px';
-    });
-
-    (function anim() {
-        rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-        ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-        requestAnimationFrame(anim);
-    })();
-</script>
-
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="ring"></div>
+    <header>
+        <h1>Alice Archive</h1>
+        <p class="header-meta">Pure-Flow Architecture // Collection v1</p>
+    </header>
+    <div class="gallery-section"><div id="gallery" class="gallery">
+        <div class='card'><a href='Anime/01.jpg' target='_blank'><img src='Anime/01.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 01.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/02.jpg' target='_blank'><img src='Anime/02.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 02.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/03.png' target='_blank'><img src='Anime/03.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 03.png</span></div></a></div>
+        <div class='card'><a href='Anime/04.jpg' target='_blank'><img src='Anime/04.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 04.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/05.jpg' target='_blank'><img src='Anime/05.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 05.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/06.jpg' target='_blank'><img src='Anime/06.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 06.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/07.png' target='_blank'><img src='Anime/07.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 07.png</span></div></a></div>
+        <div class='card'><a href='Anime/08.png' target='_blank'><img src='Anime/08.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 08.png</span></div></a></div>
+        <div class='card'><a href='Anime/09.png' target='_blank'><img src='Anime/09.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 09.png</span></div></a></div>
+        <div class='card'><a href='Anime/10.jpg' target='_blank'><img src='Anime/10.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 10.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/11.jpg' target='_blank'><img src='Anime/11.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 11.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/12.png' target='_blank'><img src='Anime/12.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 12.png</span></div></a></div>
+        <div class='card'><a href='Anime/13.png' target='_blank'><img src='Anime/13.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 13.png</span></div></a></div>
+        <div class='card'><a href='Anime/14.png' target='_blank'><img src='Anime/14.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 14.png</span></div></a></div>
+        <div class='card'><a href='Anime/15.png' target='_blank'><img src='Anime/15.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 15.png</span></div></a></div>
+        <div class='card'><a href='Anime/16.png' target='_blank'><img src='Anime/16.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 16.png</span></div></a></div>
+        <div class='card'><a href='Anime/17.jpg' target='_blank'><img src='Anime/17.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 17.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/18.png' target='_blank'><img src='Anime/18.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 18.png</span></div></a></div>
+        <div class='card'><a href='Anime/19.png' target='_blank'><img src='Anime/19.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 19.png</span></div></a></div>
+        <div class='card'><a href='Anime/20.png' target='_blank'><img src='Anime/20.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 20.png</span></div></a></div>
+        <div class='card'><a href='Anime/21.png' target='_blank'><img src='Anime/21.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 21.png</span></div></a></div>
+        <div class='card'><a href='Anime/22.jpg' target='_blank'><img src='Anime/22.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 22.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/23.jpg' target='_blank'><img src='Anime/23.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 23.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/24.jpg' target='_blank'><img src='Anime/24.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 24.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/25.png' target='_blank'><img src='Anime/25.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 25.png</span></div></a></div>
+        <div class='card'><a href='Anime/26.png' target='_blank'><img src='Anime/26.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 26.png</span></div></a></div>
+        <div class='card'><a href='Anime/27.png' target='_blank'><img src='Anime/27.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 27.png</span></div></a></div>
+        <div class='card'><a href='Anime/28.png' target='_blank'><img src='Anime/28.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 28.png</span></div></a></div>
+        <div class='card'><a href='Anime/29.png' target='_blank'><img src='Anime/29.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 29.png</span></div></a></div>
+        <div class='card'><a href='Anime/30.jpg' target='_blank'><img src='Anime/30.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 30.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/31.jpg' target='_blank'><img src='Anime/31.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 31.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/32.jpg' target='_blank'><img src='Anime/32.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 32.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/33.jpg' target='_blank'><img src='Anime/33.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 33.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/34.jpg' target='_blank'><img src='Anime/34.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 34.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/35.jpeg' target='_blank'><img src='Anime/35.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 35.jpeg</span></div></a></div>
+        <div class='card'><a href='Anime/36.jpeg' target='_blank'><img src='Anime/36.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 36.jpeg</span></div></a></div>
+        <div class='card'><a href='Anime/37.jpeg' target='_blank'><img src='Anime/37.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 37.jpeg</span></div></a></div>
+        <div class='card'><a href='Anime/38.jpg' target='_blank'><img src='Anime/38.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 38.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/39.jpeg' target='_blank'><img src='Anime/39.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 39.jpeg</span></div></a></div>
+        <div class='card'><a href='Anime/40.jpeg' target='_blank'><img src='Anime/40.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 40.jpeg</span></div></a></div>
+        <div class='card'><a href='Anime/41.jpeg' target='_blank'><img src='Anime/41.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 41.jpeg</span></div></a></div>
+        <div class='card'><a href='Anime/42.jpeg' target='_blank'><img src='Anime/42.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 42.jpeg</span></div></a></div>
+        <div class='card'><a href='Anime/43.jpg' target='_blank'><img src='Anime/43.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 43.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/44.jpg' target='_blank'><img src='Anime/44.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 44.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/45.jpg' target='_blank'><img src='Anime/45.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 45.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/46.png' target='_blank'><img src='Anime/46.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 46.png</span></div></a></div>
+        <div class='card'><a href='Anime/47.png' target='_blank'><img src='Anime/47.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 47.png</span></div></a></div>
+        <div class='card'><a href='Anime/48.png' target='_blank'><img src='Anime/48.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 48.png</span></div></a></div>
+        <div class='card'><a href='Anime/49.png' target='_blank'><img src='Anime/49.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 49.png</span></div></a></div>
+        <div class='card'><a href='Anime/50.jpg' target='_blank'><img src='Anime/50.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 50.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/51.jpg' target='_blank'><img src='Anime/51.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 51.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/52.jpg' target='_blank'><img src='Anime/52.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 52.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/53.png' target='_blank'><img src='Anime/53.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 53.png</span></div></a></div>
+        <div class='card'><a href='Anime/54.jpg' target='_blank'><img src='Anime/54.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 54.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/55.jpg' target='_blank'><img src='Anime/55.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 55.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/56.jpg' target='_blank'><img src='Anime/56.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 56.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/57.jpg' target='_blank'><img src='Anime/57.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 57.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/58.jpg' target='_blank'><img src='Anime/58.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 58.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/59.png' target='_blank'><img src='Anime/59.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 59.png</span></div></a></div>
+        <div class='card'><a href='Anime/60.jpg' target='_blank'><img src='Anime/60.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 60.jpg</span></div></a></div>
+        <div class='card'><a href='Anime/61.png' target='_blank'><img src='Anime/61.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 61.png</span></div></a></div>
+        <div class='card'><a href='Anime/62.png' target='_blank'><img src='Anime/62.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 62.png</span></div></a></div>
+        <div class='card'><a href='Anime/63.png' target='_blank'><img src='Anime/63.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 63.png</span></div></a></div>
+        <div class='card'><a href='Anime/64.png' target='_blank'><img src='Anime/64.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 64.png</span></div></a></div>
+        <div class='card'><a href='Anime/65.png' target='_blank'><img src='Anime/65.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 65.png</span></div></a></div>
+        <div class='card'><a href='Anime/66.png' target='_blank'><img src='Anime/66.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 66.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/01.jpg' target='_blank'><img src='Atmospheric/01.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 01.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/02.png' target='_blank'><img src='Atmospheric/02.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 02.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/03.png' target='_blank'><img src='Atmospheric/03.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 03.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/04.jpg' target='_blank'><img src='Atmospheric/04.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 04.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/05.png' target='_blank'><img src='Atmospheric/05.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 05.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/06.png' target='_blank'><img src='Atmospheric/06.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 06.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/07.jpg' target='_blank'><img src='Atmospheric/07.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 07.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/08.png' target='_blank'><img src='Atmospheric/08.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 08.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/09.png' target='_blank'><img src='Atmospheric/09.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 09.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/10.jpg' target='_blank'><img src='Atmospheric/10.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 10.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/11.jpg' target='_blank'><img src='Atmospheric/11.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 11.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/12.png' target='_blank'><img src='Atmospheric/12.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 12.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/13.png' target='_blank'><img src='Atmospheric/13.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 13.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/14.jpeg' target='_blank'><img src='Atmospheric/14.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 14.jpeg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/15.jpg' target='_blank'><img src='Atmospheric/15.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 15.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/16.png' target='_blank'><img src='Atmospheric/16.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 16.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/17.png' target='_blank'><img src='Atmospheric/17.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 17.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/18.jpg' target='_blank'><img src='Atmospheric/18.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 18.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/19.jpg' target='_blank'><img src='Atmospheric/19.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 19.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/20.jpg' target='_blank'><img src='Atmospheric/20.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 20.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/21.png' target='_blank'><img src='Atmospheric/21.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 21.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/22.jpg' target='_blank'><img src='Atmospheric/22.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 22.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/23.png' target='_blank'><img src='Atmospheric/23.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 23.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/24.png' target='_blank'><img src='Atmospheric/24.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 24.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/25.jpg' target='_blank'><img src='Atmospheric/25.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 25.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/26.png' target='_blank'><img src='Atmospheric/26.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 26.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/27.png' target='_blank'><img src='Atmospheric/27.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 27.png</span></div></a></div>
+        <div class='card'><a href='Atmospheric/28.jpg' target='_blank'><img src='Atmospheric/28.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 28.jpg</span></div></a></div>
+        <div class='card'><a href='Atmospheric/29.png' target='_blank'><img src='Atmospheric/29.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 29.png</span></div></a></div>
+        <div class='card'><a href='Gothicism/106.jpg' target='_blank'><img src='Gothicism/106.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Gothicism / 106.jpg</span></div></a></div>
+        <div class='card'><a href='Retro/01.png' target='_blank'><img src='Retro/01.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 01.png</span></div></a></div>
+        <div class='card'><a href='Retro/02.png' target='_blank'><img src='Retro/02.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 02.png</span></div></a></div>
+        <div class='card'><a href='Retro/03.png' target='_blank'><img src='Retro/03.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 03.png</span></div></a></div>
+        <div class='card'><a href='Retro/04.jpg' target='_blank'><img src='Retro/04.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 04.jpg</span></div></a></div>
+        <div class='card'><a href='Retro/05.png' target='_blank'><img src='Retro/05.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 05.png</span></div></a></div>
+        <div class='card'><a href='Retro/87.png' target='_blank'><img src='Retro/87.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 87.png</span></div></a></div>
+    </div></div>
+    <script>
+        const cur = document.getElementById('cursor'); const ring = document.getElementById('ring');
+        let mx = 0, my = 0, rx = 0, ry = 0;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; });
+        (function animateRing() { rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animateRing); })();
+        const obs = new IntersectionObserver(entries => { entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 50); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
+        document.querySelectorAll('.card').forEach(c => obs.observe(c));
+    </script>
 </body>
 </html>
