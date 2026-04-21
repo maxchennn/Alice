@@ -6,78 +6,198 @@ cat <<EOF > index.html
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice // Archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500&family=Fraunces:ital,wght@1,300&display=swap" rel="stylesheet">
+    <title>Alice Era // Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Syne:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --bg: #050505; --fg: #e0dcd3; --dim: #121212; --muted: #444; }
+
+        :root {
+            --bg: #080808;
+            --fg: #efefef;
+            --dim: #1e1e1e;
+            --muted: #555;
+        }
 
         body {
-            background: var(--bg); color: var(--fg);
-            font-family: 'Space Grotesk', sans-serif; font-weight: 300;
-            overflow-x: hidden; cursor: none;
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Syne', sans-serif;
+            font-weight: 300;
+            overflow-x: hidden;
+            cursor: none;
         }
 
-        /* Custom Cursor */
-        .cursor { position: fixed; width: 6px; height: 6px; background: var(--fg); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
-        .cursor-ring { position: fixed; width: 26px; height: 26px; border: 1px solid rgba(224,220,211,0.15); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; }
+        .cursor { position: fixed; width: 8px; height: 8px; background: var(--fg); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
+        .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; }
 
         header {
-            height: 70vh; display: flex; flex-direction: column; justify-content: center;
-            padding: 0 8vw; position: relative; border-bottom: 1px solid var(--dim);
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 6vw;
+            border-bottom: 1px solid var(--dim);
         }
 
-        h1 { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; font-size: clamp(4rem, 12vw, 10rem); line-height: 0.9; letter-spacing: -0.03em; }
-        .header-meta { margin-top: 2rem; font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted); }
+        .header-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
 
-        .gallery-section { padding: 8vw; }
-        .gallery { columns: 3; column-gap: 20px; }
-        @media (max-width: 1100px) { .gallery { columns: 2; } }
-        @media (max-width: 700px) { .gallery { columns: 1; } }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            font-size: clamp(4rem, 12vw, 10rem);
+            line-height: 0.88;
+            letter-spacing: -0.04em;
+        }
+
+        h1 em { font-style: italic; color: var(--muted); display: block; }
+
+        .category-section {
+            padding: 6vh 0;
+            border-bottom: 1px solid #111;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            padding-left: 6vw;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .section-label::after { content: ''; flex: 1; height: 1px; background: var(--dim); }
+
+        .carousel-container {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0 6vw 20px;
+            gap: 20px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none;
+        }
+
+        .carousel-container::-webkit-scrollbar { display: none; }
 
         .card {
-            break-inside: avoid; margin-bottom: 20px; position: relative;
-            background: var(--dim); overflow: hidden; opacity: 0; transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+            flex: 0 0 450px;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+            background: var(--dim);
+            aspect-ratio: 16/10;
         }
-        .card.visible { opacity: 1; transform: translateY(0); }
-        .card img { width: 100%; display: block; filter: grayscale(100%); transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1), filter 0.8s ease; }
-        .card:hover img { transform: scale(1.08); filter: grayscale(0%); }
-        .card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: flex-end; padding: 20px; }
+
+        @media (max-width: 768px) { .card { flex: 0 0 300px; } }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8) grayscale(100%);
+            transition: transform 0.9s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.6s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.05);
+            filter: brightness(1) grayscale(0%);
+        }
+
+        .card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+
         .card:hover .card-overlay { opacity: 1; }
-        .card-num { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--fg); text-transform: uppercase; }
+        .card-info { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--fg); text-transform: uppercase; }
+
+        footer {
+            padding: 8vh 6vw;
+            text-align: center;
+            font-size: 0.6rem;
+            letter-spacing: 0.3em;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
-    <div class="cursor" id="cursor"></div>
-    <div class="cursor-ring" id="ring"></div>
-    <header>
-        <h1>Alice Archive</h1>
-        <p class="header-meta">Pure-Flow Architecture // Collection v1</p>
-    </header>
-    <div class="gallery-section"><div id="gallery" class="gallery">
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<header>
+    <p class="header-label">Digital Archive</p>
+    <h1>Alice<em>Era</em></h1>
+</header>
+
+<main>
 EOF
 
-# Dinamik Tarama
-find . -maxdepth 2 -not -path '*/.*' -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | sort | while read -r img; do
-    clean_path="${img#./}"
-    folder=$(dirname "$clean_path")
-    filename=$(basename "$clean_path")
-    if [ "$folder" != "." ]; then
-        echo "        <div class='card'><a href='$clean_path' target='_blank'><img src='$clean_path' loading='lazy'><div class='card-overlay'><span class='card-num'>$folder / $filename</span></div></a></div>" >> index.html
+find . -maxdepth 1 -type d -not -path '*/.*' -not -path '.' | sort | while read -r dir; do
+    folder_name="${dir#./}"
+    has_images=$(find "$dir" -maxdepth 1 -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | wc -l)
+    
+    if [ "$has_images" -gt 0 ]; then
+        echo "    <section class='category-section'>" >> index.html
+        echo "        <div class='section-label'>$folder_name</div>" >> index.html
+        echo "        <div class='carousel-container'>" >> index.html
+        
+        find "$dir" -maxdepth 1 -type f \( -name "*.jpg" -o -name "*.png" -o -name "*.jpeg" -o -name "*.webp" \) | sort | while read -r img; do
+            clean_path="${img#./}"
+            filename=$(basename "$clean_path")
+            echo "            <div class='card'>" >> index.html
+            echo "                <a href='$clean_path' target='_blank'>" >> index.html
+                echo "                    <img src='$clean_path' loading='lazy'>" >> index.html
+                echo "                    <div class='card-overlay'><span class='card-info'>$filename</span></div>" >> index.html
+            echo "                </a>" >> index.html
+            echo "            </div>" >> index.html
+        done
+        
+        echo "        </div>" >> index.html
+        echo "    </section>" >> index.html
     fi
 done
 
 cat <<EOF >> index.html
-    </div></div>
-    <script>
-        const cur = document.getElementById('cursor'); const ring = document.getElementById('ring');
-        let mx = 0, my = 0, rx = 0, ry = 0;
-        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; });
-        (function animateRing() { rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animateRing); })();
-        const obs = new IntersectionObserver(entries => { entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 50); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
-        document.querySelectorAll('.card').forEach(c => obs.observe(c));
-    </script>
+</main>
+
+<footer>
+    Alice Era // 2026 Archive
+</footer>
+
+<script>
+    const cur = document.getElementById('cursor');
+    const ring = document.getElementById('ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+    });
+
+    (function anim() {
+        rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+        ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+        requestAnimationFrame(anim);
+    })();
+</script>
+
 </body>
 </html>
 EOF
