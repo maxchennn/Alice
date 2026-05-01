@@ -33,12 +33,91 @@
     }
 
     [data-theme="light"] {
-      --bg:    #eff1f5;
-      --bg2:   #e6e9ef;
-      --bg3:   #dce0e8;
-      --border:#bcc0cc;
-      --text:  #4c4f69;
-      --muted: #8c8fa1;
+      /* Catppuccin Latte — eski tarayıcı uyumlu, blur yok */
+      --bg:    #eff1f5;   /* base       */
+      --bg2:   #ffffff;   /* kartlar tam beyaz — net kontrast */
+      --bg3:   #e6e9ef;   /* surface0   */
+      --border:#8c8fa1;   /* overlay1 — ince ama belirgin */
+      --text:  #4c4f69;   /* text       */
+      --muted: #9ca0b0;   /* subtext0   */
+
+      --fg2:   #1e66f5;   /* blue       */
+      --fg3:   #04a5e5;   /* sapphire   */
+      --ac1:   #179299;   /* teal       */
+      --ac2:   #209fb5;   /* sky        */
+      --ac3:   #40a02b;   /* green      */
+      --ac4:   #df8e1d;   /* yellow     */
+      --ac5:   #fe640b;   /* peach      */
+      --ac6:   #e64553;   /* red        */
+      --ac7:   #8839ef;   /* mauve      */
+    }
+
+    /* ── Light mode overrides — no blur, no rgba opacity tricks ── */
+    [data-theme="light"] h1 {
+      background: linear-gradient(135deg, #179299 0%, #8839ef 50%, #e64553 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Kategori etiketleri — opak arka plan, no color-mix */
+    [data-theme="light"] .sh1 { color: #179299; background: #d8f4f5; border-color: #b3e8ea; }
+    [data-theme="light"] .sh2 { color: #179299; background: #d1f2f7; border-color: #a8e4ee; }
+    [data-theme="light"] .sh3 { color: #40a02b; background: #daf0d4; border-color: #b5e0ac; }
+    [data-theme="light"] .sh4 { color: #b06a00; background: #faecd1; border-color: #f0d5a0; }
+    [data-theme="light"] .sh5 { color: #c94800; background: #fde8d8; border-color: #f8c9a8; }
+    [data-theme="light"] .sh6 { color: #c2003a; background: #fcdde1; border-color: #f5b5be; }
+    [data-theme="light"] .sh7 { color: #8839ef; background: #ead8fb; border-color: #d0aaf5; }
+
+    /* Kartlar — beyaz + ince gölge, blur yok */
+    [data-theme="light"] .section {
+      background: #ffffff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    [data-theme="light"] .section.selected {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="light"] .c a {
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    [data-theme="light"] .c a:hover {
+      border-color: #1e66f5;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      transform: translateY(-3px);
+    }
+
+    [data-theme="light"] .theme-btn.active {
+      background: #1e66f5;
+      border-color: #1e66f5;
+      color: #ffffff;
+    }
+    [data-theme="light"] .theme-btn:hover {
+      color: #4c4f69;
+      border-color: #4c4f69;
+    }
+
+    [data-theme="light"] .pager-btn.selected {
+      background: #1e66f5;
+      border-color: #1e66f5;
+      color: #ffffff;
+    }
+    [data-theme="light"] .pager-btn:hover {
+      color: #4c4f69;
+      border-color: #4c4f69;
+    }
+
+    [data-theme="light"] .float-btn {
+      background: #ffffff;
+      border-color: #acb0be;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    [data-theme="light"] .float-btn:hover {
+      background: #ffffff;
+      border-color: #1e66f5;
+      color: #1e66f5;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -102,13 +181,13 @@
     .section-heading:active { transform: translateY(0); }
 
     /* 7 accent colors cycling */
-    .sh1 { color: var(--ac1); background: color-mix(in srgb, var(--ac1) 10%, transparent); }
-    .sh2 { color: var(--ac2); background: color-mix(in srgb, var(--ac2) 10%, transparent); }
-    .sh3 { color: var(--ac3); background: color-mix(in srgb, var(--ac3) 10%, transparent); }
-    .sh4 { color: var(--ac4); background: color-mix(in srgb, var(--ac4) 10%, transparent); }
-    .sh5 { color: var(--ac5); background: color-mix(in srgb, var(--ac5) 10%, transparent); }
-    .sh6 { color: var(--ac6); background: color-mix(in srgb, var(--ac6) 10%, transparent); }
-    .sh7 { color: var(--ac7); background: color-mix(in srgb, var(--ac7) 10%, transparent); }
+    .sh1 { color: #89dceb; background: #152229; border-color: #1e3a44; }
+    .sh2 { color: #94e2d5; background: #14231f; border-color: #1d3830; }
+    .sh3 { color: #a6e3a1; background: #182318; border-color: #253d24; }
+    .sh4 { color: #f9e2af; background: #2a2214; border-color: #3d301a; }
+    .sh5 { color: #fab387; background: #271c12; border-color: #3d2a18; }
+    .sh6 { color: #eba0ac; background: #271418; border-color: #3d1f25; }
+    .sh7 { color: #cba6f7; background: #1e1530; border-color: #2e2048; }
 
     /* ── SECTION WRAPPER ── */
     .section {
@@ -269,7 +348,6 @@
       cursor: pointer;
       text-decoration: none;
       transition: all 0.2s;
-      backdrop-filter: blur(8px);
     }
     .float-btn:hover {
       background: var(--bg3);
