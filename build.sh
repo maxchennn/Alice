@@ -22,21 +22,21 @@
 
 generate_thumbnails() {
   echo "generate thumbnails ..."
-  mkdir -p thumbnails
-  rm -rf thumbnails/*
+  mkdir -p .thumbnails
+  rm -rf .thumbnails/*
   
-  total_images=$(find . -mindepth 2 -maxdepth 2 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) | grep -v './thumbnails/' | wc -l)
+  total_images=$(find . -mindepth 2 -maxdepth 2 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) | grep -v './.thumbnails/' | wc -l)
   current_image=0
   
   for section_dir in ./*/; do
     # Skip non-category dirs
     case "${section_dir}" in
-      ./thumbnails/|./.git/) continue ;;
+      ./.thumbnails/|./.git/) continue ;;
     esac
     [ -d "$section_dir" ] || continue
     section_name="${section_dir%/}"
     section_name="${section_name##*/}"
-    mkdir -p "thumbnails/$section_name"
+    mkdir -p ".thumbnails/$section_name"
     
     for img in "${section_dir%/}"/*; do
       [ -f "$img" ] || continue
@@ -47,13 +47,13 @@ generate_thumbnails() {
       
       current_image=$((current_image + 1))
       local img_filename="${img##*/}"
-      local thumbnail="thumbnails/$section_name/$img_filename"
+      local thumbnail=".thumbnails/$section_name/$img_filename"
       echo "($current_image/$total_images): $img -> $thumbnail"
       magick "$img" -resize 300x300 "$thumbnail"
     done
     
     if [ -d "${section_dir%/}/light" ]; then
-      mkdir -p "thumbnails/$section_name/light"
+      mkdir -p ".thumbnails/$section_name/light"
       for img in "${section_dir%/}/light"/*; do
         [ -f "$img" ] || continue
         case "$img" in
@@ -63,7 +63,7 @@ generate_thumbnails() {
         
         current_image=$((current_image + 1))
         local img_filename="${img##*/}"
-        local thumbnail="thumbnails/$section_name/light/$img_filename"
+        local thumbnail=".thumbnails/$section_name/light/$img_filename"
         echo "($current_image/$total_images): $img -> $thumbnail"
         magick "$img" -resize 300x300 "$thumbnail"
       done
@@ -111,8 +111,7 @@ EOF
     
     local img_path="${wallpaper#./}"
     local img_filename="${wallpaper##*/}"
-    local thumbnail_path="thumbnails/$section/$img_filename"
-    echo "    { src: '$img_path', thumb: '$thumbnail_path', alt: '$img_filename' }," >> "$data_file"
+    echo "    { src: '$img_path', thumb: '$img_path', alt: '$img_filename' }," >> "$data_file"
   done
 
   echo "  ]," >> "$data_file"
@@ -127,7 +126,7 @@ EOF
       
       local img_path="${wallpaper#./}"
       local img_filename="${wallpaper##*/}"
-      local thumbnail_path="thumbnails/$section/light/$img_filename"
+      local thumbnail_path=".thumbnails/$section/light/$img_filename"
       echo "    { src: '$img_path', thumb: '$thumbnail_path', alt: '$img_filename' }," >> "$data_file"
     done
     echo "  ]" >> "$data_file"
@@ -549,7 +548,7 @@ declare -a sections_with_light
 for subdir in ./*/; do
   # Skip non-category dirs
   case "${subdir}" in
-    ./thumbnails/|./.git/) continue ;;
+    ./.thumbnails/|./.git/) continue ;;
   esac
   [ -d "$subdir" ] || continue
   section="${subdir%/}"
