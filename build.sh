@@ -25,14 +25,20 @@ generate_thumbnails() {
   mkdir -p thumbnails
   rm -rf thumbnails/*
   
-  total_images=$(find ./wallpapers -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) | wc -l)
+  total_images=$(find . -mindepth 2 -maxdepth 2 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) | grep -v './thumbnails/' | wc -l)
   current_image=0
   
-  for section_dir in ./wallpapers/*; do
-    section_name="${section_dir##*/}"
+  for section_dir in ./*/; do
+    # Skip non-category dirs
+    case "${section_dir}" in
+      ./thumbnails/|./.git/) continue ;;
+    esac
+    [ -d "$section_dir" ] || continue
+    section_name="${section_dir%/}"
+    section_name="${section_name##*/}"
     mkdir -p "thumbnails/$section_name"
     
-    for img in "$section_dir"/*; do
+    for img in "${section_dir%/}"/*; do
       [ -f "$img" ] || continue
       case "$img" in
         *.jpg|*.jpeg|*.png|*.JPG|*.JPEG|*.PNG) ;;
@@ -43,12 +49,12 @@ generate_thumbnails() {
       local img_filename="${img##*/}"
       local thumbnail="thumbnails/$section_name/$img_filename"
       echo "($current_image/$total_images): $img -> $thumbnail"
-      convert "$img" -resize 300x300 "$thumbnail"
+      magick "$img" -resize 300x300 "$thumbnail"
     done
     
-    if [ -d "$section_dir/light" ]; then
+    if [ -d "${section_dir%/}/light" ]; then
       mkdir -p "thumbnails/$section_name/light"
-      for img in "$section_dir/light"/*; do
+      for img in "${section_dir%/}/light"/*; do
         [ -f "$img" ] || continue
         case "$img" in
           *.jpg|*.jpeg|*.png|*.JPG|*.JPEG|*.PNG) ;;
@@ -59,7 +65,7 @@ generate_thumbnails() {
         local img_filename="${img##*/}"
         local thumbnail="thumbnails/$section_name/light/$img_filename"
         echo "($current_image/$total_images): $img -> $thumbnail"
-        convert "$img" -resize 300x300 "$thumbnail"
+        magick "$img" -resize 300x300 "$thumbnail"
       done
     fi
   done
@@ -145,7 +151,7 @@ cat > index.html << 'EOF'
 <head>
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <title>Wallpapers</title>
+  <title>Alice</title>
   <style>
     /* ── PALETTE ── */
     :root {
@@ -454,7 +460,7 @@ cat > index.html << 'EOF'
   </div>
 
   <main>
-    <h1>Wallpapers</h1>
+    <h1>Alice</h1>
 EOF
 
 # Generate sections
@@ -462,8 +468,14 @@ color=1
 declare -a sections
 declare -a sections_with_light
 
-for subdir in ./wallpapers/*; do
-  section="${subdir##*/}"
+for subdir in ./*/; do
+  # Skip non-category dirs
+  case "${subdir}" in
+    ./thumbnails/|./.git/) continue ;;
+  esac
+  [ -d "$subdir" ] || continue
+  section="${subdir%/}"
+  section="${section##*/}"
   sections+=("$section")
   has_light=$(check_has_light_folder "$subdir")
   

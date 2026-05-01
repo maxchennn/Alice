@@ -3,7 +3,7 @@
 <head>
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-  <title>Wallpapers</title>
+  <title>Alice</title>
   <style>
     /* ── PALETTE ── */
     :root {
@@ -312,17 +312,47 @@
   </div>
 
   <main>
-    <h1>Wallpapers</h1>
-    <div class='section' id='*'>
-      <div class='section-header' onclick='activeSection("*")' style='cursor:pointer'>
+    <h1>Alice</h1>
+    <div class='section' id='Anime'>
+      <div class='section-header' onclick='activeSection("Anime")' style='cursor:pointer'>
         <svg class='chevron' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m9 18 6-6-6-6'/></svg>
-        <span class='section-heading sh1'>*</span>
+        <span class='section-heading sh1'>ANIME</span>
       </div>
-      <div class='section-content' id='*-content'>
+      <div class='section-content' id='Anime-content'>
         <div class='loading'>loading...</div>
       </div>
     </div>
-  <script src='*_data.js'></script>
+    <div class='section' id='Atmospheric'>
+      <div class='section-header' onclick='activeSection("Atmospheric")' style='cursor:pointer'>
+        <svg class='chevron' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m9 18 6-6-6-6'/></svg>
+        <span class='section-heading sh2'>ATMOSPHERIC</span>
+      </div>
+      <div class='section-content' id='Atmospheric-content'>
+        <div class='loading'>loading...</div>
+      </div>
+    </div>
+    <div class='section' id='Gothicism'>
+      <div class='section-header' onclick='activeSection("Gothicism")' style='cursor:pointer'>
+        <svg class='chevron' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m9 18 6-6-6-6'/></svg>
+        <span class='section-heading sh3'>GOTHICISM</span>
+      </div>
+      <div class='section-content' id='Gothicism-content'>
+        <div class='loading'>loading...</div>
+      </div>
+    </div>
+    <div class='section' id='Retro'>
+      <div class='section-header' onclick='activeSection("Retro")' style='cursor:pointer'>
+        <svg class='chevron' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m9 18 6-6-6-6'/></svg>
+        <span class='section-heading sh4'>RETRO</span>
+      </div>
+      <div class='section-content' id='Retro-content'>
+        <div class='loading'>loading...</div>
+      </div>
+    </div>
+  <script src='Anime_data.js'></script>
+  <script src='Atmospheric_data.js'></script>
+  <script src='Gothicism_data.js'></script>
+  <script src='Retro_data.js'></script>
   <script>
     let activeSectionName = null;
     let sectionStates = {};
@@ -476,7 +506,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      activeSection('*');
+      activeSection('Anime');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setMainTheme(prefersDark ? 'dark' : 'light');
     });
