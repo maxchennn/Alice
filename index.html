@@ -1,168 +1,485 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='en'>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alice // Archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500&family=Fraunces:ital,wght@1,300&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        :root { --bg: #050505; --fg: #e0dcd3; --dim: #121212; --muted: #444; }
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <title>Wallpapers</title>
+  <style>
+    /* ── PALETTE ── */
+    :root {
+      --c0: #0d0d0d;
+      --c1: #111318;
+      --c2: #1a1d26;
+      --c3: #22263a;
+      --c4: #2e3450;
+      --fg:  #cdd6f4;
+      --fg2: #89b4fa;
+      --fg3: #74c7ec;
+      --ac1: #89dceb;
+      --ac2: #94e2d5;
+      --ac3: #a6e3a1;
+      --ac4: #f9e2af;
+      --ac5: #fab387;
+      --ac6: #eba0ac;
+      --ac7: #cba6f7;
 
-        body {
-            background: var(--bg); color: var(--fg);
-            font-family: 'Space Grotesk', sans-serif; font-weight: 300;
-            overflow-x: hidden; cursor: none;
-        }
+      --bg:     var(--c0);
+      --bg2:    var(--c1);
+      --bg3:    var(--c2);
+      --border: var(--c3);
+      --text:   var(--fg);
+      --muted:  #6c7086;
+      --radius: 6px;
+    }
 
-        /* Custom Cursor */
-        .cursor { position: fixed; width: 6px; height: 6px; background: var(--fg); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); }
-        .cursor-ring { position: fixed; width: 26px; height: 26px; border: 1px solid rgba(224,220,211,0.15); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; }
+    [data-theme="light"] {
+      --bg:    #eff1f5;
+      --bg2:   #e6e9ef;
+      --bg3:   #dce0e8;
+      --border:#bcc0cc;
+      --text:  #4c4f69;
+      --muted: #8c8fa1;
+    }
 
-        header {
-            height: 70vh; display: flex; flex-direction: column; justify-content: center;
-            padding: 0 8vw; position: relative; border-bottom: 1px solid var(--dim);
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        h1 { font-family: 'Fraunces', serif; font-style: italic; font-weight: 300; font-size: clamp(4rem, 12vw, 10rem); line-height: 0.9; letter-spacing: -0.03em; }
-        .header-meta { margin-top: 2rem; font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--muted); }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 14px;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
 
-        .gallery-section { padding: 8vw; }
-        .gallery { columns: 3; column-gap: 20px; }
-        @media (max-width: 1100px) { .gallery { columns: 2; } }
-        @media (max-width: 700px) { .gallery { columns: 1; } }
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        .card {
-            break-inside: avoid; margin-bottom: 20px; position: relative;
-            background: var(--dim); overflow: hidden; opacity: 0; transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1);
-        }
-        .card.visible { opacity: 1; transform: translateY(0); }
-        .card img { width: 100%; display: block; filter: grayscale(100%); transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1), filter 0.8s ease; }
-        .card:hover img { transform: scale(1.08); filter: grayscale(0%); }
-        .card-overlay { position: absolute; inset: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: flex-end; padding: 20px; }
-        .card:hover .card-overlay { opacity: 1; }
-        .card-num { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--fg); text-transform: uppercase; }
-    </style>
+    /* ── LAYOUT ── */
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    /* ── HEADER ── */
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 56px;
+      background: linear-gradient(135deg, var(--ac1) 0%, var(--ac7) 50%, var(--ac6) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── SECTION HEADINGS ── */
+    .section-heading {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      margin-bottom: 0;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      user-select: none;
+    }
+    .section-heading:hover  { border-color: currentColor; transform: translateY(-1px); }
+    .section-heading:active { transform: translateY(0); }
+
+    /* 7 accent colors cycling */
+    .sh1 { color: var(--ac1); background: color-mix(in srgb, var(--ac1) 10%, transparent); }
+    .sh2 { color: var(--ac2); background: color-mix(in srgb, var(--ac2) 10%, transparent); }
+    .sh3 { color: var(--ac3); background: color-mix(in srgb, var(--ac3) 10%, transparent); }
+    .sh4 { color: var(--ac4); background: color-mix(in srgb, var(--ac4) 10%, transparent); }
+    .sh5 { color: var(--ac5); background: color-mix(in srgb, var(--ac5) 10%, transparent); }
+    .sh6 { color: var(--ac6); background: color-mix(in srgb, var(--ac6) 10%, transparent); }
+    .sh7 { color: var(--ac7); background: color-mix(in srgb, var(--ac7) 10%, transparent); }
+
+    /* ── SECTION WRAPPER ── */
+    .section {
+      margin-bottom: 12px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid transparent;
+      transition: border-color 0.3s;
+    }
+    .section.selected {
+      border-color: var(--border);
+    }
+
+    .section-header {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ── SECTION CONTENT ── */
+    .section-content {
+      padding: 0 20px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1),
+                  opacity 0.3s ease,
+                  padding 0.3s ease;
+    }
+    .section.selected .section-content {
+      max-height: 4000px;
+      opacity: 1;
+      padding: 0 20px 24px;
+    }
+
+    /* ── THEME SWITCHER ── */
+    .section-theme-switcher {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.3s 0.1s, transform 0.3s 0.1s;
+    }
+    .section.selected .section-theme-switcher {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .theme-btn {
+      padding: 5px 14px;
+      font-family: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-btn:hover  { color: var(--text); border-color: var(--text); }
+    .theme-btn.active {
+      background: var(--fg2);
+      border-color: var(--fg2);
+      color: var(--c0);
+    }
+
+    /* ── IMAGE GRID ── */
+    .c {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .c a {
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .c a:hover {
+      border-color: var(--fg2);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .c img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      transition: filter 0.2s;
+    }
+    .c a:hover img { filter: brightness(1.08); }
+
+    /* ── PAGER ── */
+    .pager {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .pager-btn {
+      padding: 4px 12px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pager-btn:hover    { color: var(--text); border-color: var(--text); }
+    .pager-btn.selected {
+      background: var(--fg2);
+      border-color: var(--fg2);
+      color: var(--c0);
+    }
+
+    /* ── SUBSECTION TOGGLE ── */
+    .subsection-content         { display: none; }
+    .subsection-content.active  { display: block; }
+
+    /* ── LOADING ── */
+    .loading {
+      padding: 32px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── FLOAT BUTTONS ── */
+    .float-btns {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 100;
+    }
+    .float-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg2);
+      border: 1.5px solid var(--border);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .float-btn:hover {
+      background: var(--bg3);
+      border-color: var(--fg2);
+      color: var(--fg2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .float-btn svg { width: 18px; height: 18px; }
+
+    /* ── CHEVRON ── */
+    .chevron {
+      width: 14px;
+      height: 14px;
+      color: var(--muted);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+    .section.selected .chevron { transform: rotate(90deg); }
+
+    /* ── HIDDEN ── */
+    .hidden { display: none !important; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar       { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+  </style>
 </head>
 <body>
-    <div class="cursor" id="cursor"></div>
-    <div class="cursor-ring" id="ring"></div>
-    <header>
-        <h1>Alice Archive</h1>
-        <p class="header-meta">Pure-Flow Architecture // Collection v1</p>
-    </header>
-    <div class="gallery-section"><div id="gallery" class="gallery">
-        <div class='card'><a href='Anime/01.jpg' target='_blank'><img src='Anime/01.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 01.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/02.jpg' target='_blank'><img src='Anime/02.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 02.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/03.png' target='_blank'><img src='Anime/03.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 03.png</span></div></a></div>
-        <div class='card'><a href='Anime/04.jpg' target='_blank'><img src='Anime/04.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 04.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/05.jpg' target='_blank'><img src='Anime/05.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 05.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/06.jpg' target='_blank'><img src='Anime/06.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 06.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/07.png' target='_blank'><img src='Anime/07.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 07.png</span></div></a></div>
-        <div class='card'><a href='Anime/08.png' target='_blank'><img src='Anime/08.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 08.png</span></div></a></div>
-        <div class='card'><a href='Anime/09.png' target='_blank'><img src='Anime/09.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 09.png</span></div></a></div>
-        <div class='card'><a href='Anime/10.jpg' target='_blank'><img src='Anime/10.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 10.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/11.jpg' target='_blank'><img src='Anime/11.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 11.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/12.png' target='_blank'><img src='Anime/12.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 12.png</span></div></a></div>
-        <div class='card'><a href='Anime/13.png' target='_blank'><img src='Anime/13.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 13.png</span></div></a></div>
-        <div class='card'><a href='Anime/14.png' target='_blank'><img src='Anime/14.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 14.png</span></div></a></div>
-        <div class='card'><a href='Anime/15.png' target='_blank'><img src='Anime/15.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 15.png</span></div></a></div>
-        <div class='card'><a href='Anime/16.png' target='_blank'><img src='Anime/16.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 16.png</span></div></a></div>
-        <div class='card'><a href='Anime/17.jpg' target='_blank'><img src='Anime/17.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 17.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/18.png' target='_blank'><img src='Anime/18.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 18.png</span></div></a></div>
-        <div class='card'><a href='Anime/19.png' target='_blank'><img src='Anime/19.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 19.png</span></div></a></div>
-        <div class='card'><a href='Anime/20.png' target='_blank'><img src='Anime/20.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 20.png</span></div></a></div>
-        <div class='card'><a href='Anime/21.png' target='_blank'><img src='Anime/21.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 21.png</span></div></a></div>
-        <div class='card'><a href='Anime/22.jpg' target='_blank'><img src='Anime/22.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 22.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/23.jpg' target='_blank'><img src='Anime/23.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 23.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/24.jpg' target='_blank'><img src='Anime/24.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 24.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/25.png' target='_blank'><img src='Anime/25.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 25.png</span></div></a></div>
-        <div class='card'><a href='Anime/26.png' target='_blank'><img src='Anime/26.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 26.png</span></div></a></div>
-        <div class='card'><a href='Anime/27.png' target='_blank'><img src='Anime/27.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 27.png</span></div></a></div>
-        <div class='card'><a href='Anime/28.png' target='_blank'><img src='Anime/28.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 28.png</span></div></a></div>
-        <div class='card'><a href='Anime/29.png' target='_blank'><img src='Anime/29.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 29.png</span></div></a></div>
-        <div class='card'><a href='Anime/30.jpg' target='_blank'><img src='Anime/30.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 30.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/31.jpg' target='_blank'><img src='Anime/31.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 31.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/32.jpg' target='_blank'><img src='Anime/32.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 32.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/33.jpg' target='_blank'><img src='Anime/33.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 33.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/34.jpg' target='_blank'><img src='Anime/34.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 34.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/35.jpeg' target='_blank'><img src='Anime/35.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 35.jpeg</span></div></a></div>
-        <div class='card'><a href='Anime/36.jpeg' target='_blank'><img src='Anime/36.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 36.jpeg</span></div></a></div>
-        <div class='card'><a href='Anime/37.jpeg' target='_blank'><img src='Anime/37.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 37.jpeg</span></div></a></div>
-        <div class='card'><a href='Anime/38.jpg' target='_blank'><img src='Anime/38.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 38.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/39.jpeg' target='_blank'><img src='Anime/39.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 39.jpeg</span></div></a></div>
-        <div class='card'><a href='Anime/40.jpeg' target='_blank'><img src='Anime/40.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 40.jpeg</span></div></a></div>
-        <div class='card'><a href='Anime/41.jpeg' target='_blank'><img src='Anime/41.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 41.jpeg</span></div></a></div>
-        <div class='card'><a href='Anime/42.jpeg' target='_blank'><img src='Anime/42.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 42.jpeg</span></div></a></div>
-        <div class='card'><a href='Anime/43.jpg' target='_blank'><img src='Anime/43.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 43.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/44.jpg' target='_blank'><img src='Anime/44.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 44.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/45.jpg' target='_blank'><img src='Anime/45.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 45.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/46.png' target='_blank'><img src='Anime/46.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 46.png</span></div></a></div>
-        <div class='card'><a href='Anime/47.png' target='_blank'><img src='Anime/47.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 47.png</span></div></a></div>
-        <div class='card'><a href='Anime/48.png' target='_blank'><img src='Anime/48.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 48.png</span></div></a></div>
-        <div class='card'><a href='Anime/49.png' target='_blank'><img src='Anime/49.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 49.png</span></div></a></div>
-        <div class='card'><a href='Anime/50.jpg' target='_blank'><img src='Anime/50.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 50.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/51.jpg' target='_blank'><img src='Anime/51.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 51.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/52.jpg' target='_blank'><img src='Anime/52.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 52.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/53.png' target='_blank'><img src='Anime/53.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 53.png</span></div></a></div>
-        <div class='card'><a href='Anime/54.jpg' target='_blank'><img src='Anime/54.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 54.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/55.jpg' target='_blank'><img src='Anime/55.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 55.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/56.jpg' target='_blank'><img src='Anime/56.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 56.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/57.jpg' target='_blank'><img src='Anime/57.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 57.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/58.jpg' target='_blank'><img src='Anime/58.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 58.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/59.png' target='_blank'><img src='Anime/59.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 59.png</span></div></a></div>
-        <div class='card'><a href='Anime/60.jpg' target='_blank'><img src='Anime/60.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 60.jpg</span></div></a></div>
-        <div class='card'><a href='Anime/61.png' target='_blank'><img src='Anime/61.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 61.png</span></div></a></div>
-        <div class='card'><a href='Anime/62.png' target='_blank'><img src='Anime/62.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 62.png</span></div></a></div>
-        <div class='card'><a href='Anime/63.png' target='_blank'><img src='Anime/63.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 63.png</span></div></a></div>
-        <div class='card'><a href='Anime/64.png' target='_blank'><img src='Anime/64.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 64.png</span></div></a></div>
-        <div class='card'><a href='Anime/65.png' target='_blank'><img src='Anime/65.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 65.png</span></div></a></div>
-        <div class='card'><a href='Anime/66.png' target='_blank'><img src='Anime/66.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Anime / 66.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/01.jpg' target='_blank'><img src='Atmospheric/01.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 01.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/02.png' target='_blank'><img src='Atmospheric/02.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 02.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/03.png' target='_blank'><img src='Atmospheric/03.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 03.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/04.jpg' target='_blank'><img src='Atmospheric/04.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 04.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/05.png' target='_blank'><img src='Atmospheric/05.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 05.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/06.png' target='_blank'><img src='Atmospheric/06.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 06.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/07.jpg' target='_blank'><img src='Atmospheric/07.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 07.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/08.png' target='_blank'><img src='Atmospheric/08.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 08.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/09.png' target='_blank'><img src='Atmospheric/09.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 09.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/10.jpg' target='_blank'><img src='Atmospheric/10.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 10.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/11.jpg' target='_blank'><img src='Atmospheric/11.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 11.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/12.png' target='_blank'><img src='Atmospheric/12.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 12.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/13.png' target='_blank'><img src='Atmospheric/13.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 13.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/14.jpeg' target='_blank'><img src='Atmospheric/14.jpeg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 14.jpeg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/15.jpg' target='_blank'><img src='Atmospheric/15.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 15.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/16.png' target='_blank'><img src='Atmospheric/16.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 16.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/17.png' target='_blank'><img src='Atmospheric/17.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 17.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/18.jpg' target='_blank'><img src='Atmospheric/18.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 18.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/19.jpg' target='_blank'><img src='Atmospheric/19.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 19.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/20.jpg' target='_blank'><img src='Atmospheric/20.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 20.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/21.png' target='_blank'><img src='Atmospheric/21.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 21.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/22.jpg' target='_blank'><img src='Atmospheric/22.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 22.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/23.png' target='_blank'><img src='Atmospheric/23.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 23.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/24.png' target='_blank'><img src='Atmospheric/24.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 24.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/25.jpg' target='_blank'><img src='Atmospheric/25.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 25.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/26.png' target='_blank'><img src='Atmospheric/26.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 26.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/27.png' target='_blank'><img src='Atmospheric/27.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 27.png</span></div></a></div>
-        <div class='card'><a href='Atmospheric/28.jpg' target='_blank'><img src='Atmospheric/28.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 28.jpg</span></div></a></div>
-        <div class='card'><a href='Atmospheric/29.png' target='_blank'><img src='Atmospheric/29.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Atmospheric / 29.png</span></div></a></div>
-        <div class='card'><a href='Gothicism/106.jpg' target='_blank'><img src='Gothicism/106.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Gothicism / 106.jpg</span></div></a></div>
-        <div class='card'><a href='Retro/01.png' target='_blank'><img src='Retro/01.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 01.png</span></div></a></div>
-        <div class='card'><a href='Retro/02.png' target='_blank'><img src='Retro/02.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 02.png</span></div></a></div>
-        <div class='card'><a href='Retro/03.png' target='_blank'><img src='Retro/03.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 03.png</span></div></a></div>
-        <div class='card'><a href='Retro/04.jpg' target='_blank'><img src='Retro/04.jpg' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 04.jpg</span></div></a></div>
-        <div class='card'><a href='Retro/05.png' target='_blank'><img src='Retro/05.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 05.png</span></div></a></div>
-        <div class='card'><a href='Retro/87.png' target='_blank'><img src='Retro/87.png' loading='lazy'><div class='card-overlay'><span class='card-num'>Retro / 87.png</span></div></a></div>
-    </div></div>
-    <script>
-        const cur = document.getElementById('cursor'); const ring = document.getElementById('ring');
-        let mx = 0, my = 0, rx = 0, ry = 0;
-        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cur.style.left = mx + 'px'; cur.style.top = my + 'px'; });
-        (function animateRing() { rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animateRing); })();
-        const obs = new IntersectionObserver(entries => { entries.forEach((e, i) => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('visible'), i * 50); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
-        document.querySelectorAll('.card').forEach(c => obs.observe(c));
-    </script>
+  <div class='float-btns'>
+    <a href='https://github.com' target='_blank' class='float-btn' title='Source code'>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+    </a>
+    <button onclick='switchMainTheme()' class='float-btn' title='Switch theme'>
+      <svg id="light-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+      <svg id="dark-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+    </button>
+  </div>
+
+  <main>
+    <h1>Wallpapers</h1>
+    <div class='section' id='*'>
+      <div class='section-header' onclick='activeSection("*")' style='cursor:pointer'>
+        <svg class='chevron' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m9 18 6-6-6-6'/></svg>
+        <span class='section-heading sh1'>*</span>
+      </div>
+      <div class='section-content' id='*-content'>
+        <div class='loading'>loading...</div>
+      </div>
+    </div>
+  <script src='*_data.js'></script>
+  <script>
+    let activeSectionName = null;
+    let sectionStates = {};
+
+    function initSectionState(section) {
+      if (!sectionStates[section]) {
+        sectionStates[section] = {
+          currentTheme: 'dark',
+          currentPages: { dark: 1, light: 1 },
+          loaded: false
+        };
+      }
+    }
+
+    function activeSection(section) {
+      const targetSection = document.getElementById(section);
+      const isAlreadyOpen = targetSection.classList.contains('selected');
+
+      // Close all
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('selected'));
+      activeSectionName = null;
+
+      // If it wasn't open, open it
+      if (!isAlreadyOpen) {
+        targetSection.classList.add('selected');
+        activeSectionName = section;
+        initSectionState(section);
+
+        if (!sectionStates[section].loaded) {
+          loadSectionContent(section);
+        }
+        if (window.sectionData[section].hasLight) {
+          switchSectionTheme(section, 'dark');
+        }
+        setTimeout(() => {
+          targetSection.scrollIntoView({ block: 'start', behavior: 'smooth' });
+        }, 100);
+      }
+    }
+
+    function loadSectionContent(section) {
+      const contentDiv = document.getElementById(section + '-content');
+      const data = window.sectionData[section];
+      if (!data) {
+        contentDiv.innerHTML = '<div class="loading">error: data not found</div>';
+        return;
+      }
+
+      // Rebuild innerHTML, keep theme-switcher if present
+      let themeSwitcher = '';
+      const existingSwitcher = contentDiv.querySelector('.section-theme-switcher');
+      if (existingSwitcher) themeSwitcher = existingSwitcher.outerHTML;
+
+      let html = themeSwitcher;
+
+      if (data.dark.length > 0) {
+        html += `<div class="subsection-content active" id="${section}-dark">`;
+        const darkPages = Math.ceil(data.dark.length / data.maxPerPage);
+        if (darkPages > 1) {
+          html += '<div class="pager">';
+          for (let i = 1; i <= darkPages; i++) {
+            html += `<button class="pager-btn${i===1?' selected':''}" onclick="loadPage('${section}','dark',${i})">${i}</button>`;
+          }
+          html += '</div>';
+        }
+        html += `<div id="${section}-dark-content">${generateImageGrid(data.dark.slice(0, data.maxPerPage))}</div>`;
+        html += '</div>';
+      }
+
+      if (data.hasLight && data.light.length > 0) {
+        html += `<div class="subsection-content" id="${section}-light">`;
+        const lightPages = Math.ceil(data.light.length / data.maxPerPage);
+        if (lightPages > 1) {
+          html += '<div class="pager">';
+          for (let i = 1; i <= lightPages; i++) {
+            html += `<button class="pager-btn${i===1?' selected':''}" onclick="loadPage('${section}','light',${i})">${i}</button>`;
+          }
+          html += '</div>';
+        }
+        html += `<div id="${section}-light-content">${generateImageGrid(data.light.slice(0, data.maxPerPage))}</div>`;
+        html += '</div>';
+      }
+
+      contentDiv.innerHTML = html;
+      sectionStates[section].loaded = true;
+    }
+
+    function generateImageGrid(images) {
+      let html = '<div class="c">';
+      images.forEach(img => {
+        html += `<a target="_blank" href="${img.src}">
+          <img loading="lazy" src="${img.thumb}" alt="${img.alt}">
+        </a>`;
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function switchSectionTheme(section, theme) {
+      initSectionState(section);
+      sectionStates[section].currentTheme = theme;
+
+      const darkBtn  = document.getElementById(section + '-dark-btn');
+      const lightBtn = document.getElementById(section + '-light-btn');
+      if (darkBtn && lightBtn) {
+        darkBtn.classList.toggle('active', theme === 'dark');
+        lightBtn.classList.toggle('active', theme === 'light');
+      }
+
+      const darkContent  = document.getElementById(section + '-dark');
+      const lightContent = document.getElementById(section + '-light');
+      if (darkContent && lightContent) {
+        darkContent.classList.toggle('active', theme === 'dark');
+        lightContent.classList.toggle('active', theme === 'light');
+      }
+
+      loadPage(section, theme, 1);
+    }
+
+    function loadPage(section, theme, page) {
+      const data = window.sectionData[section];
+      const images = data[theme];
+      const startIdx = (page - 1) * data.maxPerPage;
+      const pageImages = images.slice(startIdx, startIdx + data.maxPerPage);
+
+      const contentDiv = document.getElementById(`${section}-${theme}-content`);
+      if (contentDiv) contentDiv.innerHTML = generateImageGrid(pageImages);
+
+      const pagerBtns = document.getElementById(`${section}-${theme}`)?.getElementsByClassName('pager-btn');
+      if (pagerBtns) {
+        for (let i = 0; i < pagerBtns.length; i++) {
+          pagerBtns[i].classList.toggle('selected', i === page - 1);
+        }
+      }
+
+      initSectionState(section);
+      sectionStates[section].currentPages[theme] = page;
+    }
+
+    // ── Main theme ──
+    function setMainTheme(theme) {
+      document.documentElement.dataset.theme = theme === 'light' ? 'light' : '';
+      document.body.dataset.theme = theme;
+      document.getElementById('light-icon')?.classList.toggle('hidden', theme === 'light');
+      document.getElementById('dark-icon')?.classList.toggle('hidden', theme === 'dark');
+    }
+
+    function switchMainTheme() {
+      const current = document.body.dataset.theme;
+      setMainTheme(current === 'light' ? 'dark' : 'light');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      activeSection('*');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setMainTheme(prefersDark ? 'dark' : 'light');
+    });
+  </script>
 </body>
 </html>
