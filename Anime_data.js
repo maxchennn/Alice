@@ -63,6 +63,10 @@ window.sectionData['Anime'] = {
     { src: 'Anime//72.png', thumb: 'Anime//72.png', alt: '72.png' },
     { src: 'Anime//73.png', thumb: 'Anime//73.png', alt: '73.png' },
     { src: 'Anime//74.png', thumb: 'Anime//74.png', alt: '74.png' },
+    { src: 'Anime//75.jpg', thumb: 'Anime//75.jpg', alt: '75.jpg' },
+    { src: 'Anime//76.jpg', thumb: 'Anime//76.jpg', alt: '76.jpg' },
+    { src: 'Anime//77.jpg', thumb: 'Anime//77.jpg', alt: '77.jpg' },
+    { src: 'Anime//78.jpg', thumb: 'Anime//78.jpg', alt: '78.jpg' },
   ],
   light: []
 };

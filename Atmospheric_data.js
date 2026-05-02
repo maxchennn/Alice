@@ -36,6 +36,7 @@ window.sectionData['Atmospheric'] = {
     { src: 'Atmospheric//30.png', thumb: 'Atmospheric//30.png', alt: '30.png' },
     { src: 'Atmospheric//31.png', thumb: 'Atmospheric//31.png', alt: '31.png' },
     { src: 'Atmospheric//32.png', thumb: 'Atmospheric//32.png', alt: '32.png' },
+    { src: 'Atmospheric//33.jpg', thumb: 'Atmospheric//33.jpg', alt: '33.jpg' },
   ],
   light: []
 };
